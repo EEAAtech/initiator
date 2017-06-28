@@ -21,7 +21,7 @@ namespace IncredibleInvoicer
         }
     
         public int TaxID { get; set; }
-        public byte[] Tax1 { get; set; }
+        public Nullable<decimal> Tax1 { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Invoice> Invoices { get; set; }

@@ -21,7 +21,7 @@ namespace IncredibleInvoicer
         }
     
         public int ItemID { get; set; }
-        public byte[] Item1 { get; set; }
+        public string Item1 { get; set; }
         public Nullable<int> CustomerID { get; set; }
         public Nullable<decimal> Qty { get; set; }
         public Nullable<int> UnitID { get; set; }

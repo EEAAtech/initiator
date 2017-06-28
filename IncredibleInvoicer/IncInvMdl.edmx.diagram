@@ -6,20 +6,20 @@
     <edmx:Diagrams>
       <Diagram DiagramId="e72cb793f95b46b294bf352d1ea7facd" Name="Diagram1">
         <EntityTypeShape EntityType="IncredibleInvoicerModel.Customer" Width="1.5" PointX="0.75" PointY="4" IsExpanded="true" />
-        <EntityTypeShape EntityType="IncredibleInvoicerModel.InvoiceDetail" Width="1.5" PointX="8.25" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="IncredibleInvoicerModel.Invoice" Width="1.5" PointX="3" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="IncredibleInvoicerModel.Item" Width="1.5" PointX="6" PointY="4.25" IsExpanded="true" />
         <EntityTypeShape EntityType="IncredibleInvoicerModel.State" Width="1.5" PointX="0.75" PointY="8.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="IncredibleInvoicerModel.Tax" Width="1.5" PointX="0.75" PointY="0.875" IsExpanded="true" />
         <EntityTypeShape EntityType="IncredibleInvoicerModel.Unit" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_Invoices_ToCustomers" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToCustomers" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToInvoice" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToItem" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToUnits" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_Invoices_ToTaxes" ManuallyRouted="false" />
-        <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToUnits" ManuallyRouted="false" />
         <AssociationConnector Association="IncredibleInvoicerModel.FK_Customers_ToState" />
+        <EntityTypeShape EntityType="IncredibleInvoicerModel.Invoice" Width="1.5" PointX="3" PointY="4.375" />
+        <EntityTypeShape EntityType="IncredibleInvoicerModel.Tax" Width="1.5" PointX="0.75" PointY="1" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_Invoices_ToCustomers" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_Invoices_ToTaxes" />
+        <EntityTypeShape EntityType="IncredibleInvoicerModel.InvoiceDetail" Width="1.5" PointX="8.25" PointY="2.625" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToInvoice" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToUnits" />
+        <EntityTypeShape EntityType="IncredibleInvoicerModel.Item" Width="1.5" PointX="6" PointY="2.75" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToCustomers" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToItem" />
+        <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToUnits" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

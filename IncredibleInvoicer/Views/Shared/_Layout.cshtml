@@ -3,22 +3,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Nunes HR and Payroll</title>
+    <title>@ViewBag.Title - M/s Shivani Hotel Supplies Inc.</title>
     @Styles.Render("~/Content/themes/base/css")
     @Scripts.Render("~/bundles/modernizr")
     @Styles.Render("~/Content/css")
-    @Styles.Render("~/Content/dtpic")
+    
 
     
 </head>
-<body >
+<body>
     @Html.Partial("_MenuPartial")
     
     @Scripts.Render("~/bundles/jquery")
-    
     @Scripts.Render("~/bundles/jqueryui")
 
-    @Scripts.Render("~/bundles/jquerydtpicker")
+    
     <div id="TopBody" class="container body-content">
         @RenderBody()
         <hr />
@@ -31,6 +30,17 @@
     @RenderSection("scripts", required: false)
 
 <script>
+    
+
+    $(document).ready(function () {
+        $('*[data-autocomplete-url]')
+            .each(function () {
+                $(this).autocomplete({
+                    source: $(this).data("autocomplete-url")
+                });
+            });
+    });
+
     $(function () {
         //Change the "a" in menu and body
         var sel = $('.dropdown-menu a');

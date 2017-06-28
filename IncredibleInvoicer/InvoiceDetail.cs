@@ -22,7 +22,7 @@ namespace IncredibleInvoicer
         public Nullable<decimal> Rate { get; set; }
     
         public virtual Invoice Invoice { get; set; }
-        public virtual Item Item { get; set; }
         public virtual Unit Unit { get; set; }
+        public virtual Item Item { get; set; }
     }
 }

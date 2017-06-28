@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace Panchayat
+namespace IncredibleInvoicer
 {
     public class BundleConfig
     {

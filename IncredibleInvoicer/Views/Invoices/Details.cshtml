@@ -1,0 +1,218 @@
+﻿@model IncredibleInvoicer.InvoiceDetailStr
+
+@{
+    ViewBag.Title = "Invoice";
+}
+<div style="display:block;" class="section-to-not-print">
+    <h3 style="float:left; display:inline;">Invoice No: @ViewBag.Inv.InvoiceID</h3>
+    <h3 style="float:right; display:inline;">Invoice date:   @String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.InvDate)</h3>
+</div>
+
+
+    <div class="section-to-only-print">
+        <span  style="float:left; font-size:x-large;">Invoice No: @ViewBag.Inv.InvoiceID    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;         &nbsp;  Invoice date:   @String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.InvDate)</span>        
+    </div>
+
+<div class="section-to-not-print">
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = ViewBag.Inv.InvoiceID }) |
+        @Html.ActionLink("Back to List", "Index")
+        <input type="button" onclick="javascript:window.print();" value="Print" class="eabutton" />
+    </p>
+</div>
+    <div class="MastDet">
+    <div class="section-to-print">
+        <table width="80%">
+            <tr >
+                <td>P.O. Date :</td>
+                <td style="border-right:inset;">@String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.POdate)</td>
+                <td style="padding-left: 15px;">P.O. No. :</td>
+                <td>@ViewBag.Inv.POno</td>
+            </tr>
+            <tr>
+                <td>Customer :</td>
+                <td style="border-right:inset;">@ViewBag.Inv.Customer.Name</td>
+                <td style="padding-left: 15px;">Tax % :</td>
+                <td>@ViewBag.Inv.Tax.Tax1</td>
+            </tr>
+
+        </table>
+    </div>
+</div>
+        <div class="section-to-not-print">
+    @using (Html.BeginForm("CreateDet", "Invoices", FormMethod.Post))
+            {
+        @Html.AntiForgeryToken()
+
+        <div class="form-inline">
+            <h4>InvoiceDetail</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.Hidden("InvoiceID", (int)ViewBag.Inv.InvoiceID)
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Item</label>
+                <div class="col-md-10">
+                    <input type="text" id="Item" name="Item" style="color:black;" data-autocomplete-url="@Url.Action("AutoComplete")" />
+                    @Html.ValidationMessageFor(model => model.Item, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Qty, "Qty: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @*@Html.LabelFor(model => model.UnitID, "Unit: ", htmlAttributes: new { @class = "control-label col-md-2" })*@
+                <div class="col-md-10">
+                    @Html.DropDownList("UnitID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.UnitID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Rate, "Rate: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Rate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+        <hr />
+</div>
+
+
+    <div class="section-to-print">
+        <table class="table" id="InvPage">
+            <tr>
+                <th>Sr. No</th>
+                <th>
+                    Item
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Rate
+                </th>
+                <th>
+                    Units
+                </th>
+                <th>
+                    Total
+                </th>
+                <th></th>
+            </tr>
+
+            @{ 
+                IEnumerable<InvoiceDetail> indetails = ViewBag.InvDet;
+                int srn = 1;
+                decimal stot = 0.0M;
+                decimal tot = 0.0M;
+            }
+
+            @foreach (var indet in indetails)
+            {
+                if((srn % 8)==0)
+                    { 
+                        @:<tr class="eabreakpage">
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                        <tr class="section-to-only-print">
+                            <th>Sr. No</th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Rate
+                            </th>
+                            <th>
+                                Units
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th></th>
+                        </tr>
+                }
+                else
+                {
+                        @:<tr>
+                    }
+
+                    <td>
+                        @srn
+                        @{ srn++;
+                            stot = (decimal)indet.Qty * (decimal)indet.Rate;
+                            tot += stot;
+                         }
+                    </td>
+                    <td>
+                        @indet.Item.Item1
+                    </td>
+                    <td>
+                        @indet.Qty
+                    </td>
+                    <td>
+                        @indet.Rate
+                    </td>
+                    <td>
+                        @indet.Unit.Unit1
+                    </td>
+                    <td>
+                        @String.Format("{0:0.00}", stot)
+                    </td>
+                    <td>
+                        <span class="section-to-not-print">
+                            @Html.ActionLink("Delete", "DeleteDet", new { id = indet.InvoiceDetailID, invid = indet.InvoiceID })
+                        </span>
+                    </td>
+                @:</tr>
+            }
+
+        </table>
+        @{ 
+            var taxamt = (decimal)@ViewBag.Inv.Tax.Tax1;
+            var calctax = tot * (taxamt/100);
+            var Gross = tot + calctax;
+        }
+        <h4>Invoice Total: <u>Rs. @String.Format("{0:0.00}", tot)</u> + Tax: Rs. @String.Format("{0:0.00}", calctax) = <u>Rs. @String.Format("{0:0.00}", Gross) /-</u></h4>
+    </div>

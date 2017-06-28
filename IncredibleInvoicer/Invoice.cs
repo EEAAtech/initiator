@@ -22,14 +22,14 @@ namespace IncredibleInvoicer
     
         public int InvoiceID { get; set; }
         public Nullable<System.DateTime> InvDate { get; set; }
-        public byte[] POno { get; set; }
+        public string POno { get; set; }
         public Nullable<System.DateTime> POdate { get; set; }
         public Nullable<int> CustomerID { get; set; }
         public Nullable<int> TaxID { get; set; }
     
         public virtual Customer Customer { get; set; }
+        public virtual Tax Tax { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<InvoiceDetail> InvoiceDetails { get; set; }
-        public virtual Tax Tax { get; set; }
     }
 }

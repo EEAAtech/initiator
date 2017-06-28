@@ -1,0 +1,64 @@
+﻿@model IncredibleInvoicer.Invoice
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Invoice</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.InvDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.InvDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.POno)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.POno)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.POdate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.POdate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Customer.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Customer.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Tax.TaxID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Tax.TaxID)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

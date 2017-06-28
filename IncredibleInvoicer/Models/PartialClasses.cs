@@ -10,73 +10,67 @@ using System.Web;
 
 namespace IncredibleInvoicer
 {
-    //[MetadataType(typeof(ConfigMetadata))]
-    //public partial class Config
-    //{
-    //}
+    [MetadataType(typeof(CustomerMetadata))]
+    public partial class Customer
+    {
+    }
 
-    //[MetadataType(typeof(EmpTypeMetadata))]
-    //public partial class EmpTypes
-    //{
-    //}
+    [MetadataType(typeof(InvoiceMetadata))]
+    public partial class Invoice
+    {
+    }
 
-    //[MetadataType(typeof(EDocTypeMetadata))]
-    //public partial class EDocTypes
-    //{
-    //}
+    [MetadataType(typeof(InvoiceDetailMetadata))]
+    public partial class InvoiceDetail
+    {
+    }
 
-    //[MetadataType(typeof(AllowanceTypeMetadata))]
-    //public partial class AllowanceTypes
-    //{
-    //}
+    [MetadataType(typeof(StateMetadata))]
+    public partial class State
+    {
+    }
 
-    //[MetadataType(typeof(EmployeesMetadata))]
-    //public partial class Employees
-    //{
-    //}
+    [MetadataType(typeof(TaxMetadata))]
+    public partial class Tax
+    {
+    }
 
-    //[MetadataType(typeof(EmpDocsMetadata))]
-    //public partial class EmpDocs
-    //{
-    //}
+    [MetadataType(typeof(UnitMetadata))]
+    public partial class Unit
+    {
+    }
 
-    //[MetadataType(typeof(EmploymentHistoryMetadata))]
-    //public partial class EmploymentHistory
-    //{
-    //}
-    //[MetadataType(typeof(LoansMetadata))]
-    //public partial class Loans
-    //{
-    //}
-    //[MetadataType(typeof(LoanSkipMetadata))]
-    //public partial class LoanSkip
-    //{
-    //}
 
-    //[MetadataType(typeof(AllowanceMetadata))]
-    //public partial class Allowance
-    //{
-    //}
+    ///// <summary>
+    ///// Used for inputing Invoice Details
+    ///// </summary>
+    //public class NewEmp
+    
+    public class InvoiceDetailStr
+    {
+        public int InvoiceDetailID { get; set; }
+        public Nullable<int> InvoiceID { get; set; }
 
-    //[MetadataType(typeof(AdvanceMetadata))]
-    //public partial class Advance
-    //{
-    //}
+        public string Item { get; set; }  //we are making this class just so that this can be string for autocomplete
 
-    //[MetadataType(typeof(BonusMetadata))]
-    //public partial class Bonus
-    //{        
-    //}
+        [Display(Name = "Quantity")]
+        [Required]
+        [Range(0.0, Double.MaxValue)]
+        public decimal Qty { get; set; }
 
-    //[MetadataType(typeof(WagesMetadata))]
-    //public partial class Wages
-    //{
-    //}
+        [Display(Name = "Units")]
+        [Required]
+        public int UnitID { get; set; }
 
-    //[MetadataType(typeof(PayrollMetadata))]
-    //public partial class Payroll
-    //{
-    //}
+        [Display(Name = "Rate")]
+        [Required]
+        [Range(0.0, Double.MaxValue)]
+        public decimal Rate { get; set; }
+    }
+
+    
+
+
 
     //public class DailyAllowEvent
     //{
@@ -104,7 +98,7 @@ namespace IncredibleInvoicer
     //    [Display(Name = "Drivers Lic. Expiry Date")]
     //    [RequiredIf(CompareToInt =1)] //EmpTypeID 1 has to be driver
     //    public Nullable<System.DateTime> DrivLicExp { get; set; }
-        
+
     //}
 
     ///// <summary>
@@ -203,7 +197,7 @@ namespace IncredibleInvoicer
     //{
     //    public int EmpID { get; set; }
     //    public DateTime Dayt { get; set; }
-        
+
     //    public bool IsLeave { get; set; }
     //}
 
@@ -242,7 +236,7 @@ namespace IncredibleInvoicer
     //                return ValidationResult.Success;
     //            comparer = " less than or equal to ";
     //        }
-            
+
     //        return new ValidationResult(ErrorMessage ?? "Make sure your date is " + comparer + CompareDate.ToString("dd-MMM-yyyy"));
     //    }
 
@@ -251,7 +245,7 @@ namespace IncredibleInvoicer
     //public class RequiredIfAttribute : ValidationAttribute
     //{
     //    public int CompareToInt { get; set; }
-        
+
 
     //    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     //    {
