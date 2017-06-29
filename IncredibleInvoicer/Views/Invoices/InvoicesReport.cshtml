@@ -1,0 +1,140 @@
+﻿@model IEnumerable<IncredibleInvoicer.Invoice>
+
+@{
+    ViewBag.Title = String.Format("Invoices Report From {0:dd-MMM-yyyy} to {1:dd-MMM-yyyy}", ViewBag.FromDt, ViewBag.ToDt);
+    int srn = 1;
+}
+<style type="text/css">
+    table {
+        page-break-inside: auto
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto
+    }
+
+    thead {
+        display: table-header-group
+    }
+
+    tfoot {
+        display: table-footer-group
+    }
+</style>
+<div class="section-to-not-print">
+    <h2>@ViewBag.Title</h2>
+    <input type="button" onclick="javascript:window.print();" value="Print" class="eabutton" />
+</div>
+<table class="table section-to-print">
+    <thead>
+        <tr>
+            <th>
+                Sr. No.
+            </th>
+            <th>
+                Invoice ID
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InvDate)
+            </th>
+            <th>
+                Total Net
+            </th>
+            <th>
+                Tax %
+            </th>
+            <th>
+                Total Tax
+            </th>
+            <th>
+                Total Gross
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @srn
+                    @{ srn++; }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FriendlyID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InvDate)
+                </td>
+                <td>
+                    @{
+                        //Calc the summation figures
+                        decimal tnet, ttax, tgros;
+                        tnet = ttax = tgros = 0;
+                        foreach (var itd in item.InvoiceDetails)
+                        {
+                            tnet += (decimal)itd.Qty * (decimal)itd.Rate;
+                        }
+
+                        ttax = tnet * ((decimal)item.Tax.Tax1 / 100);
+                        tgros = tnet + ttax;
+                    }
+                    @String.Format("{0:0.00}", tnet)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tax.Tax1)
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", ttax)
+                </td>
+                <td>
+                    @String.Format("{0:0.00}", tgros)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="8">
+                    <table class="table table-condensed" style="color:darkblue; font-weight:100;" id="InvPage">
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Unit</th>
+                            <th>Rate</th>
+                            <th>Net</th>
+                            <th>Tax</th>
+                            <th>Gross</th>
+                        </tr>
+                        @foreach (var itd in item.InvoiceDetails)
+                {
+                            <tr>
+                                <th>@itd.Item.Item1</th>
+                                <th>@String.Format("{0:0.00}", itd.Qty)</th>
+                                <th>@String.Format("{0:0.00}", itd.Unit.Unit1)</th>
+                                <th>@String.Format("{0:0.00}", itd.Rate)</th>
+                                <th>
+                                    @{
+                                        decimal pnet, ptax, pgros;
+                                        pnet = ptax = pgros = 0;
+                                        pnet = (decimal)itd.Qty * (decimal)itd.Rate;
+                                        ptax = pnet * ((decimal)item.Tax.Tax1 / 100);
+                                        pgros = pnet + ptax;
+                                    }
+                                    @String.Format("{0:0.00}", pnet)
+                                </th>
+                                <th>@String.Format("{0:0.00}", ptax)</th>
+                                <th>@String.Format("{0:0.00}", pgros)</th>
+                            </tr>
+                                        }
+                    </table>
+                </td>
+            </tr>
+
+                                        }
+    </tbody>
+</table>

@@ -1,46 +1,23 @@
 ﻿--SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'
 
-EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"
-DELETE FROM Holidays
-DELETE FROM Employees
- DELETE FROM EmpTypes
- DELETE FROM EmploymentHistory
- DELETE FROM EDocTypes
- DELETE FROM DailyAllowance
- DELETE FROM Attendance
- DELETE FROM Wages
- DELETE FROM Advance
- DELETE FROM AllowanceTypes
- DELETE FROM Allowance
- DELETE FROM Payroll
- DELETE FROM Loans
- DELETE FROM LoanSkip
- DELETE FROM Bonus
- DELETE FROM PayrollRemarks
- DELETE FROM PayrollAllowance
- DELETE FROM LoanPay
- DELETE FROM EmpDocs
- exec sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all"
-DBCC CHECKIDENT ( 'Holidays', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Employees', RESEED, 0) 
-  DBCC CHECKIDENT ( 'EmpTypes', RESEED, 0) 
-  DBCC CHECKIDENT ( 'EmploymentHistory', RESEED, 0) 
-  DBCC CHECKIDENT ( 'EDocTypes', RESEED, 0) 
-  DBCC CHECKIDENT ( 'DailyAllowance', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Attendance', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Wages', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Advance', RESEED, 0) 
-  DBCC CHECKIDENT ( 'AllowanceTypes', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Allowance', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Payroll', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Loans', RESEED, 0) 
-  DBCC CHECKIDENT ( 'LoanSkip', RESEED, 0) 
-  DBCC CHECKIDENT ( 'Bonus', RESEED, 0) 
-  DBCC CHECKIDENT ( 'PayrollRemarks', RESEED, 0) 
-  DBCC CHECKIDENT ( 'PayrollAllowance', RESEED, 0) 
-  DBCC CHECKIDENT ( 'LoanPay', RESEED, 0) 
-  DBCC CHECKIDENT ( 'EmpDocs', RESEED, 0) 
+--SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'
 
+EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"
+DELETE FROM Customers
+DELETE FROM InvoiceDetails
+DELETE FROM Invoices
+DELETE FROM InvYrs
+DELETE FROM Items
+DELETE FROM Taxes
+DELETE FROM Units
+exec sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all"
+DBCC CHECKIDENT ( 'Customers', RESEED, 0) 
+DBCC CHECKIDENT ( 'InvoiceDetails', RESEED, 0) 
+DBCC CHECKIDENT ( 'Invoices', RESEED, 0) 
+DBCC CHECKIDENT ( 'InvYrs', RESEED, 0) 
+DBCC CHECKIDENT ( 'Items', RESEED, 0) 
+DBCC CHECKIDENT ( 'Taxes', RESEED, 0) 
+DBCC CHECKIDENT ( 'Units', RESEED, 0) 
 
   INSERT INTO [dbo].[States] ([State]) VALUES ( 'Goa') 
 INSERT INTO [dbo].[States] ([State]) VALUES ( 'Uttar Pradesh') 

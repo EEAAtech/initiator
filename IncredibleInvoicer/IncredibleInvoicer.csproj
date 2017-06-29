@@ -233,6 +233,9 @@
     <Compile Include="InvoiceDetail.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
+    <Compile Include="InvYr.cs">
+      <DependentUpon>IncInvMdl.tt</DependentUpon>
+    </Compile>
     <Compile Include="Item.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
@@ -339,6 +342,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -428,6 +432,9 @@
     <Content Include="Views\InvoiceDetails\Details.cshtml" />
     <Content Include="Views\InvoiceDetails\Edit.cshtml" />
     <Content Include="Views\InvoiceDetails\Index.cshtml" />
+    <Content Include="Views\Invoices\InvoicesReport.cshtml" />
+    <Content Include="Views\Invoices\RptRq.cshtml" />
+    <Content Include="Views\Invoices\SummaryReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

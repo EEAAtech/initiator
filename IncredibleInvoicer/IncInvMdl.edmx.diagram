@@ -20,6 +20,7 @@
         <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToCustomers" />
         <AssociationConnector Association="IncredibleInvoicerModel.FK_InvDet_ToItem" />
         <AssociationConnector Association="IncredibleInvoicerModel.FK_Items_ToUnits" />
+        <EntityTypeShape EntityType="IncredibleInvoicerModel.InvYr" Width="1.5" PointX="5.375" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

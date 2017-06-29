@@ -10,7 +10,7 @@ using IncredibleInvoicer;
 
 namespace IncredibleInvoicer.Controllers
 {
-    public class TaxesController : Controller
+    public class TaxesController : EAController
     {
         private IncredibleInvoicerEntities db = new IncredibleInvoicerEntities();
 

@@ -1,24 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using PagedList;
+using System;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using IncredibleInvoicer;
 
 namespace IncredibleInvoicer.Controllers
 {
-    public class CustomersController : Controller
+    public class CustomersController : EAController
     {
         private IncredibleInvoicerEntities db = new IncredibleInvoicerEntities();
 
         // GET: Customers
-        public ActionResult Index()
+        public ActionResult Index(string searchString, int? page)
         {
             var customers = db.Customers.Include(c => c.State);
-            return View(customers.ToList());
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                customers = customers.Where(p => p.Name.Contains(searchString));
+
+                page = 1;
+            }
+
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return View(customers.OrderBy(c => c.Name).ToPagedList(pageNumber, pageSize));
+            
         }
 
         // GET: Customers/Details/5

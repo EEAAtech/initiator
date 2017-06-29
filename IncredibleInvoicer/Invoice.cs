@@ -26,6 +26,7 @@ namespace IncredibleInvoicer
         public Nullable<System.DateTime> POdate { get; set; }
         public Nullable<int> CustomerID { get; set; }
         public Nullable<int> TaxID { get; set; }
+        public string FriendlyID { get; set; }
     
         public virtual Customer Customer { get; set; }
         public virtual Tax Tax { get; set; }

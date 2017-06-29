@@ -53,6 +53,7 @@ namespace IncredibleInvoicer
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MMM-yyyy}", ApplyFormatInEditMode = true)]
         [Display(Name = "Invoice Date")]
+        [Required]
         public DateTime InvDate;
 
         [DataType(DataType.Date)]
@@ -68,6 +69,8 @@ namespace IncredibleInvoicer
         [Display(Name = "Tax %")]
         [Required]
         public int TaxID;
+
+        
     }
 
     public  class StateMetadata

@@ -32,5 +32,6 @@ namespace IncredibleInvoicer
         public virtual DbSet<Tax> Taxes { get; set; }
         public virtual DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<InvYr> InvYrs { get; set; }
     }
 }

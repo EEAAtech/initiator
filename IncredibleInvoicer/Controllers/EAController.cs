@@ -7,6 +7,7 @@ using System.Web.Mvc;
 namespace IncredibleInvoicer.Controllers
 {
     [HandleError]
+    [Authorize]
     public class EAController : Controller
     {
         // GET: EA

@@ -41,6 +41,14 @@
           <Property Name="POdate" Type="date" />
           <Property Name="CustomerID" Type="int" />
           <Property Name="TaxID" Type="int" />
+          <Property Name="FriendlyID" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="InvYrs">
+          <Key>
+            <PropertyRef Name="Year" />
+          </Key>
+          <Property Name="Year" Type="int" Nullable="false" />
+          <Property Name="InvLastNumber" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Items">
           <Key>
@@ -174,6 +182,7 @@
           <EntitySet Name="Customers" EntityType="Self.Customers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Invoices" EntityType="Self.Invoices" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InvYrs" EntityType="Self.InvYrs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Items" EntityType="Self.Items" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="States" EntityType="Self.States" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Taxes" EntityType="Self.Taxes" Schema="dbo" store:Type="Tables" />
@@ -290,6 +299,7 @@
             <End Role="Unit" EntitySet="Units" />
             <End Role="Item" EntitySet="Items" />
           </AssociationSet>
+          <EntitySet Name="InvYrs" EntityType="IncredibleInvoicerModel.InvYr" />
         </EntityContainer>
         <Association Name="FK_Customers_ToState">
           <End Type="IncredibleInvoicerModel.State" Role="State" Multiplicity="0..1" />
@@ -316,6 +326,7 @@
           <NavigationProperty Name="Customer" Relationship="IncredibleInvoicerModel.FK_Invoices_ToCustomers" FromRole="Invoice" ToRole="Customer" />
           <NavigationProperty Name="Tax" Relationship="IncredibleInvoicerModel.FK_Invoices_ToTaxes" FromRole="Invoice" ToRole="Tax" />
           <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToInvoice" FromRole="Invoice" ToRole="InvoiceDetail" />
+          <Property Name="FriendlyID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Tax">
           <Key>
@@ -437,6 +448,13 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="InvYr">
+          <Key>
+            <PropertyRef Name="Year" />
+          </Key>
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="InvLastNumber" Type="Int32" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -478,6 +496,7 @@
           <EntitySetMapping Name="Invoices">
             <EntityTypeMapping TypeName="IncredibleInvoicerModel.Invoice">
               <MappingFragment StoreEntitySet="Invoices">
+                <ScalarProperty Name="FriendlyID" ColumnName="FriendlyID" />
                 <ScalarProperty Name="TaxID" ColumnName="TaxID" />
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
                 <ScalarProperty Name="POdate" ColumnName="POdate" />
@@ -516,6 +535,14 @@
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
                 <ScalarProperty Name="Item1" ColumnName="Item" />
                 <ScalarProperty Name="ItemID" ColumnName="ItemID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InvYrs">
+            <EntityTypeMapping TypeName="IncredibleInvoicerModel.InvYr">
+              <MappingFragment StoreEntitySet="InvYrs">
+                <ScalarProperty Name="InvLastNumber" ColumnName="InvLastNumber" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

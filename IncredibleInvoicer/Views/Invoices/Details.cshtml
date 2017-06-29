@@ -4,13 +4,13 @@
     ViewBag.Title = "Invoice";
 }
 <div style="display:block;" class="section-to-not-print">
-    <h3 style="float:left; display:inline;">Invoice No: @ViewBag.Inv.InvoiceID</h3>
-    <h3 style="float:right; display:inline;">Invoice date:   @String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.InvDate)</h3>
+    <h3 style="float:left; display:inline;">Invoice No: @ViewBag.Inv.FriendlyID</h3>
+    <h3 style="float:right; display:inline;">Invoice date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.InvDate)</h3>
 </div>
 
 
     <div class="section-to-only-print">
-        <span  style="float:left; font-size:x-large;">Invoice No: @ViewBag.Inv.InvoiceID    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;         &nbsp;  Invoice date:   @String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.InvDate)</span>        
+        <span  style="float:left; font-size:x-large;">Invoice No: @ViewBag.Inv.InvoiceID    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;         &nbsp;  Invoice date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.InvDate)</span>        
     </div>
 
 <div class="section-to-not-print">
@@ -27,7 +27,11 @@
         <table width="80%">
             <tr >
                 <td>P.O. Date :</td>
-                <td style="border-right:inset;">@String.Format("{0:dd-MM-yyyy}", ViewBag.Inv.POdate)</td>
+                <td style="border-right:inset;">@if (ViewBag.Inv.POdate != null)
+                {
+                    String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate);
+                 }
+                </td>
                 <td style="padding-left: 15px;">P.O. No. :</td>
                 <td>@ViewBag.Inv.POno</td>
             </tr>

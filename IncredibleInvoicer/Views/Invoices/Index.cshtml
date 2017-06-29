@@ -1,10 +1,12 @@
-﻿@model IEnumerable<IncredibleInvoicer.Invoice>
+﻿@model PagedList.IPagedList<IncredibleInvoicer.Invoice>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Invoices";
 }
 
-<h2>Index</h2>
+<h2>@ViewBag.Title</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -12,22 +14,22 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.InvoiceID)
+            Invoice ID
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.InvDate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().InvDate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.POno)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().POno)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.POdate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().POdate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Customer.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Customer.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Tax.TaxID)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Tax.Tax1)
         </th>
         <th></th>
     </tr>
@@ -35,7 +37,7 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.InvoiceID)
+            @Html.DisplayFor(modelItem => item.FriendlyID)            
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.InvDate)
@@ -54,10 +56,14 @@
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.InvoiceID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.InvoiceID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.InvoiceID })
+            @Html.ActionLink("Details", "Details", new { id=item.InvoiceID }) 
+            
         </td>
     </tr>
 }
 
 </table>
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, EmpTypeID = ViewBag.EID }))

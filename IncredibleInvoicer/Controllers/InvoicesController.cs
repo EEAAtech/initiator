@@ -7,19 +7,109 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using IncredibleInvoicer;
+using PagedList;
 
 namespace IncredibleInvoicer.Controllers
 {
-    public class InvoicesController : Controller
+    public class InvoicesController : EAController
     {
         private IncredibleInvoicerEntities db = new IncredibleInvoicerEntities();
 
         // GET: Invoices
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
             var invoices = db.Invoices.Include(i => i.Customer).Include(i => i.Tax);
+
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+            return View(invoices.OrderByDescending(c => c.InvoiceID).ToPagedList(pageNumber, pageSize));
+            
+        }
+
+        // GET: Invoices report Request
+        public ActionResult InvoiceRpt()
+        {
+            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1");
+            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name");
+            ViewBag.ReturnAction = "InvoicesReport";
+            return View("RptRq");
+        }
+
+        public ActionResult InvoicesReport(FormCollection fm)
+        {
+
+            if (fm["FromDt"] ==null || fm["ToDt"] ==null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            DateTime Fd = DateTime.Parse(fm["FromDt"]);
+            DateTime Td = DateTime.Parse(fm["ToDt"]);
+
+            var invoices = db.Invoices.Where(i => i.InvDate > Fd && i.InvDate < Td);
+
+            if (fm["CustomerID"] != "")
+            {
+                var cid = int.Parse(fm["CustomerID"]);
+                invoices = invoices.Where(i => i.CustomerID == cid);
+            }
+
+            if (fm["TaxID"] != "")
+            {
+                var tid = int.Parse(fm["TaxID"]);
+                invoices = invoices.Where(i => i.TaxID == tid);
+            }
+
+            invoices = invoices.Include(i => i.InvoiceDetails);
+            ViewBag.FromDt = Fd;
+            ViewBag.ToDt = Td;
             return View(invoices.ToList());
         }
+
+        // GET: Summary report Request
+        public ActionResult SummaryRpt()
+        {
+            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1");
+            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name");
+            ViewBag.ReturnAction = "SummaryReport";
+            return View("RptRq");
+        }
+
+        public ActionResult SummaryReport(FormCollection fm)
+        {
+
+            if (fm["FromDt"] == null || fm["ToDt"] == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            DateTime Fd = DateTime.Parse(fm["FromDt"]);
+            DateTime Td = DateTime.Parse(fm["ToDt"]);
+
+
+            string str = "WITH cteInvTots (InvoiceID, Net) AS " +
+                " (SELECT InvoiceID, SUM(Qty * Rate) as Net FROM InvoiceDetails WHERE InvoiceID IN(SELECT InvoiceID FROM Invoices WHERE InvDate BETWEEN " + string.Format("'{0:yyyy-MM-dd}' AND '{1:yyyy-MM-dd}' ", Fd, Td);
+
+            if (fm["CustomerID"] != "")
+            {
+                var cid = int.Parse(fm["CustomerID"]);
+                str += " AND CustomerID = " + cid;
+            }
+
+            if (fm["TaxID"] != "")
+            {
+                var tid = int.Parse(fm["TaxID"]);
+                str += " AND TaxID = " + tid;
+            }
+
+            str += " ) GROUP BY InvoiceID) SELECT YEAR(i.InvDate) as yr, MONTH(i.InvDate) as mont, COUNT(*) as cont, SUM(c.Net) as net, SUM(c.Net * (t.Tax / 100)) as ctax " +
+                " FROM Invoices i, cteinvTots c, Taxes t WHERE i.InvoiceID = c.InvoiceID AND i.TaxID = t.TaxID " +
+                " GROUP BY YEAR(i.InvDate), MONTH(i.InvDate)";
+
+            IEnumerable<SummaryRptData> todt = db.Database.SqlQuery<SummaryRptData>(str).ToList();
+
+            ViewBag.FromDt = Fd;
+            ViewBag.ToDt = Td;
+            return View(todt.ToList());
+        }
+
+
 
         // GET: Invoices/Details/5
         public ActionResult Details(int? id)
@@ -109,6 +199,21 @@ namespace IncredibleInvoicer.Controllers
         {
             if (ModelState.IsValid)
             {
+                int lastInx=0;
+                DateTime invyr = (DateTime)invoice.InvDate;
+                if (db.InvYrs.Any(y=>y.Year==invyr.Year))
+                {
+                    lastInx = db.InvYrs.FirstOrDefault(y => y.Year == invyr.Year).InvLastNumber;
+                    var existInvYr = db.InvYrs.Find(invyr.Year);
+                    lastInx++;
+                    existInvYr.InvLastNumber = lastInx;
+                } else
+                {
+                    db.InvYrs.Add(new InvYr { Year = invyr.Year, InvLastNumber = 1 });
+                    lastInx = 1;
+                }
+
+                invoice.FriendlyID = lastInx.ToString() + "-" + invyr.Year.ToString().Substring(2);
                 db.Invoices.Add(invoice);
                 db.SaveChanges();
                 return RedirectToAction("Details", new { id = invoice.InvoiceID });

@@ -1,0 +1,79 @@
+﻿@model IEnumerable<SummaryRptData>
+
+@{
+    ViewBag.Title = String.Format("Summary Report From {0:dd-MMM-yyyy} to {1:dd-MMM-yyyy}", ViewBag.FromDt, ViewBag.ToDt);
+    
+}
+<style type="text/css">
+    table {
+        page-break-inside: auto
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto
+    }
+
+    thead {
+        display: table-header-group
+    }
+
+    tfoot {
+        display: table-footer-group
+    }
+</style>
+   
+<h3 class="section-to-print">@ViewBag.Title</h3>
+    <input type="button" onclick="javascript:window.print();" value="Print" class="eabutton section-to-not-print" />
+
+<table class="table section-to-print">
+    <thead>
+        <tr>
+            <th>
+                Year
+            </th>
+            <th>
+                Month
+            </th>
+            <th>
+                No. of Invoices
+            </th>
+            <th>
+                Total Net
+            </th>
+            <th>
+                Total Tax
+            </th>
+            <th>
+                Total Gross
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @MyExtensions.MonthFromInt(item.mont)
+                </td>
+                <td>
+                    @item.yr
+                </td>
+                <td>
+                    @item.cont
+                </td>
+                <td>
+                    @String.Format("{0:0.00}",item.net)
+                </td>
+                <td>                    
+                    @String.Format("{0:0.00}", item.ctax)
+                </td>
+                <td>                    
+                    @String.Format("{0:0.00}", item.net+item.ctax)
+                </td>
+                
+            </tr>
+
+         }
+    </tbody>
+</table>
