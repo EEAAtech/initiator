@@ -17,7 +17,7 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.InvoiceID)
 
-        <label class="control-label col-md-2" >@Html.DisplayFor(modelItem => modelItem.FriendlyID)</label>
+        <H3>Invoice ID:  @Html.DisplayFor(modelItem => modelItem.FriendlyID)</H3>
         <br />
         <div class="form-group">
             @Html.LabelFor(model => model.InvDate, htmlAttributes: new { @class = "control-label col-md-2" })

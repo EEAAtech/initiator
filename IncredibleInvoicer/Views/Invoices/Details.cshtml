@@ -32,13 +32,13 @@
                     String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate);
                  }
                 </td>
-                <td style="padding-left: 15px;">P.O. No. :</td>
+                <td style="padding-left: 15px !important;">P.O. No. :</td>
                 <td>@ViewBag.Inv.POno</td>
             </tr>
             <tr>
                 <td>Customer :</td>
                 <td style="border-right:inset;">@ViewBag.Inv.Customer.Name</td>
-                <td style="padding-left: 15px;">Tax % :</td>
+                <td style="padding-left: 15px !important;">Tax % :</td>
                 <td>@ViewBag.Inv.Tax.Tax1</td>
             </tr>
 
@@ -59,7 +59,7 @@
             <div class="form-group">
                 <label class="control-label col-md-2">Item</label>
                 <div class="col-md-10">
-                    <input type="text" id="Item" name="Item" style="color:black;" data-autocomplete-url="@Url.Action("AutoComplete")" />
+                    <input type="text" id="Item" name="Item" style="color:black;" data-autocomplete-url="@Url.Action("AutoComplete")" class="form-control" />
                     @Html.ValidationMessageFor(model => model.Item, "", new { @class = "text-danger" })
                 </div>
             </div>

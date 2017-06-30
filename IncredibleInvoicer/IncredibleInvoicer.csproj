@@ -258,6 +258,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\IncredibleInvoicer.mdf" />
+    <Content Include="App_Data\IncredibleInvoicer_log.ldf" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -436,9 +438,7 @@
     <Content Include="Views\Invoices\RptRq.cshtml" />
     <Content Include="Views\Invoices\SummaryReport.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
