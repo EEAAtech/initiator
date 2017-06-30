@@ -146,6 +146,20 @@ namespace IncredibleInvoicer.Controllers
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult AutoCompleteCusts(string term)
+        {
+            var filteredItems = db.Customers.Where(
+            c => c.Name.Contains(term)
+            ).Select(c => new { id = c.CustomerID, value = c.Name });
+
+            //var items = new[] {"Apple", "Pear", "Banana", "Pineapple", "Peach"};
+            //var filteredItems = items.Where(
+            //item => item.IndexOf(term, StringComparison.InvariantCultureIgnoreCase) >= 0
+            //);
+            return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
+
         public ActionResult DeleteDet(int id, int invid)
         {
             InvoiceDetail invoice = db.InvoiceDetails.Find(id);
@@ -237,7 +251,7 @@ namespace IncredibleInvoicer.Controllers
                 return HttpNotFound();
             }
             ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "TaxID", invoice.TaxID);
+            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1", invoice.TaxID);
             return View(invoice);
         }
 
@@ -246,7 +260,7 @@ namespace IncredibleInvoicer.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID,TaxID")] Invoice invoice)
+        public ActionResult Edit([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID,TaxID,FriendlyID")] Invoice invoice)
         {
             if (ModelState.IsValid)
             {

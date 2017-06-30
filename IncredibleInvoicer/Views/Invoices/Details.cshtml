@@ -29,7 +29,7 @@
                 <td>P.O. Date :</td>
                 <td style="border-right:inset;">@if (ViewBag.Inv.POdate != null)
                 {
-                    String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate);
+                    @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate);
                  }
                 </td>
                 <td style="padding-left: 15px !important;">P.O. No. :</td>
