@@ -1,4 +1,4 @@
-﻿@model PagedList.IPagedList<IncredibleInvoicer.Invoice>
+﻿@model PagedList.IPagedList<IncredibleInvoicer.Invoices>
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
@@ -26,10 +26,13 @@
             @Html.DisplayNameFor(model => model.FirstOrDefault().POdate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FirstOrDefault().Customer.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Customers.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FirstOrDefault().Tax.Tax1)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Banks.BankName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ReverseCharge)
         </th>
         <th></th>
     </tr>
@@ -49,10 +52,13 @@
             @Html.DisplayFor(modelItem => item.POdate)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Customer.Name)
+            @Html.DisplayFor(modelItem => item.Customers.Name)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Tax.Tax1)
+            @Html.DisplayFor(modelItem => item.Banks.BankName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReverseCharge)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.InvoiceID }) |

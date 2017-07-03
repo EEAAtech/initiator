@@ -3,22 +3,53 @@
 @{
     ViewBag.Title = "Invoice";
 }
-<div style="display:block;" class="section-to-not-print">
-    <h3 style="float:left; display:inline;">Invoice No: @ViewBag.Inv.FriendlyID</h3>
-    <h3 style="float:right; display:inline;">Invoice date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.InvDate)</h3>
+
+<style>
+    .showleft { text-align: left !important; }
+    .showright { text-align: right !important; }
+
+    .HeadTbl tr, td {
+        padding:0px;
+    }
+</style>
+
+<div style="display:block;" class="section-to-print">
+    <table class="HeadTbl" width="100%">
+        <tr>
+            <td><span style="font-size:x-large;">Invoice No: @ViewBag.Inv.FriendlyID
+            @if (ViewBag.Inv.ReverseCharge)
+            {
+                @: [REVERSED!]
+    }</span></td>
+            <td>
+                PO Number:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POno)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Invoice date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.InvDate)
+            </td>
+            <td>
+                @if (ViewBag.Inv.POdate != null)
+                {
+                   @:PO date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate)
+                }
+            </td>
+        </tr>
+    </table>
+    
+    
 </div>
 
 
-    <div class="section-to-only-print">
+    @*<div class="section-to-only-print">
         <span  style="float:left; font-size:x-large;">Invoice No: @ViewBag.Inv.InvoiceID    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;         &nbsp;  Invoice date:   @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.InvDate)</span>        
-    </div>
+    </div>*@
 
-<div class="section-to-not-print">
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-    <p>
+<div class="section-to-not-print">    
+    <p style="display:block; " >
         @Html.ActionLink("Edit", "Edit", new { id = ViewBag.Inv.InvoiceID }) |
-        @Html.ActionLink("Back to List", "Index")
+        @Html.ActionLink("Back to List", "Index") |
         <input type="button" onclick="javascript:window.print();" value="Print" class="eabutton" />
     </p>
 </div>
@@ -26,20 +57,22 @@
     <div class="section-to-print">
         <table width="80%">
             <tr >
-                <td>P.O. Date :</td>
-                <td style="border-right:inset;">@if (ViewBag.Inv.POdate != null)
-                {
-                    @String.Format("{0:dd-MMM-yyyy}", ViewBag.Inv.POdate);
-                 }
-                </td>
-                <td style="padding-left: 15px !important;">P.O. No. :</td>
-                <td>@ViewBag.Inv.POno</td>
+                <td>Bill To :</td>
+                <td style="border-right:inset;"><strong> @ViewBag.Inv.Customers.Name</strong></td>
+                <td style="padding-left: 15px !important;">City, State:</td>
+                <td>@ViewBag.Inv.Customers.City   ,     @ViewBag.Inv.Customers.State.State1</td>
             </tr>
             <tr>
-                <td>Customer :</td>
-                <td style="border-right:inset;">@ViewBag.Inv.Customer.Name</td>
-                <td style="padding-left: 15px !important;">Tax % :</td>
-                <td>@ViewBag.Inv.Tax.Tax1</td>
+                <td>@ViewBag.Inv.Customers.Address1 ,</td>
+                <td style="border-right:inset;">
+                @if (ViewBag.Inv.Customers.Address2 != null)
+                {
+                    @ViewBag.Inv.Customers.Address2
+                }
+                </td>
+
+                <td style="padding-left: 15px !important;">GSTIN :</td>
+                <td>@ViewBag.Inv.Customers.TaxNo</td>
             </tr>
 
         </table>
@@ -65,7 +98,23 @@
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.Qty, "Qty: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <label class="control-label col-md-2">TV Sr.#</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Disc, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Disc, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">HSN Code</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.HSNCode, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.HSNCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Qty, "Qty ", htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
@@ -73,7 +122,7 @@
             </div>
 
             <div class="form-group">
-                @*@Html.LabelFor(model => model.UnitID, "Unit: ", htmlAttributes: new { @class = "control-label col-md-2" })*@
+                @Html.LabelFor(model => model.UnitID, "Msrmt. Units", htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.DropDownList("UnitID", null, htmlAttributes: new { @class = "form-control" })
                     @Html.ValidationMessageFor(model => model.UnitID, "", new { @class = "text-danger" })
@@ -81,7 +130,7 @@
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.Rate, "Rate: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.Rate, "Rate ", htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.EditorFor(model => model.Rate, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
@@ -89,8 +138,24 @@
             </div>
 
             <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Create" class="btn btn-default" />
+                @Html.LabelFor(model => model.Rate, "Disc. ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Discount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.TaxID, "Tax Amt.", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("TaxID", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.TaxID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+                    <input type="submit" value="Add" class="btn btn-default" />
                 </div>
             </div>
         </div>
@@ -102,20 +167,28 @@
     <div class="section-to-print">
         <table class="table" id="InvPage">
             <tr>
-                <th>Sr. No</th>
-                <th>
+                <th class="showleft">Sr. No</th>
+                <th class="showleft">
                     Item
                 </th>
-                <th>
-                    Quantity
+                <th class="showleft">
+                    HSN Code
                 </th>
-                <th>
-                    Rate
+                <th class="showright">
+                    Qty
                 </th>
-                <th>
+                <th class="showright">
                     Units
                 </th>
-                <th>
+                <th class="showright">
+                    Rate
+                </th>
+                <th class="showright">
+                    Discount
+                </th>
+                <th class="showright">Tax%</th>
+                <th class="showright">Tax Amt.</th>
+                <th class="showright">
                     Total
                 </th>
                 <th></th>
@@ -125,6 +198,8 @@
                 IEnumerable<InvoiceDetail> indetails = ViewBag.InvDet;
                 int srn = 1;
                 decimal stot = 0.0M;
+                decimal stax = 0.0M;
+                decimal ttax = 0.0M;
                 decimal tot = 0.0M;
             }
 
@@ -158,20 +233,28 @@
                             <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
                         </tr>
                         <tr class="section-to-only-print">
-                            <th>Sr. No</th>
-                            <th>
+                            <th class="showleft">Sr. No</th>
+                            <th class="showleft">
                                 Item
                             </th>
-                            <th>
-                                Quantity
+                            <th class="showleft">
+                                HSN Code
                             </th>
-                            <th>
-                                Rate
+                            <th class="showright">
+                                Qty
                             </th>
-                            <th>
+                            <th class="showright">
                                 Units
                             </th>
-                            <th>
+                            <th class="showright">
+                                Rate
+                            </th>
+                            <th class="showright">
+                                Discount
+                            </th>
+                            <th class="showright">Tax%</th>
+                            <th class="showright">Tax Amt.</th>
+                            <th class="showright">
                                 Total
                             </th>
                             <th></th>
@@ -184,27 +267,47 @@
 
                     <td>
                         @srn
-                        @{ srn++;
+                        @{ srn++; //All the Calc for this row
                             stot = (decimal)indet.Qty * (decimal)indet.Rate;
+                            if (indet.Discount != null)
+                            {
+                                stot -= (decimal)indet.Discount;
+                            }
+                            stax = stot * ((decimal)indet.Taxes.Tax / 100);
+                            //stax = (decimal)indet.Taxes.Tax;
                             tot += stot;
-                         }
+                            ttax += stax;
+                        }
                     </td>
                     <td>
-                        @indet.Item.Item1
+                        @indet.Items.Item <br />
+                        @if (@indet.Disc != null) { 
+                            @indet.Disc  
+                            }
                     </td>
-                    <td>
+                    <td>@indet.HSNCode</td>
+                    <td align="right">
                         @indet.Qty
                     </td>
-                    <td>
-                        @indet.Rate
-                    </td>
-                    <td>
+                    <td align="right">
                         @indet.Unit.Unit1
                     </td>
-                    <td>
-                        @String.Format("{0:0.00}", stot)
+                    <td align="right">
+                        @indet.Rate
                     </td>
-                    <td>
+                    <td align="right">
+                        @indet.Discount
+                    </td>
+                    <td align="right">
+                        @indet.Taxes.Tax
+                    </td>
+                    <td align="right">                        
+                        @String.Format("{0:0.00}", stax)
+                    </td>
+                    <td align="right">
+                        @String.Format("{0:0.00}", stot + stax)
+                    </td>
+                    <td class="showright">
                         <span class="section-to-not-print">
                             @Html.ActionLink("Delete", "DeleteDet", new { id = indet.InvoiceDetailID, invid = indet.InvoiceID })
                         </span>
@@ -213,10 +316,28 @@
             }
 
         </table>
-        @{ 
-            var taxamt = (decimal)@ViewBag.Inv.Tax.Tax1;
-            var calctax = tot * (taxamt/100);
-            var Gross = tot + calctax;
-        }
-        <h4>Invoice Total: <u>Rs. @String.Format("{0:0.00}", tot)</u> + Tax: Rs. @String.Format("{0:0.00}", calctax) = <u>Rs. @String.Format("{0:0.00}", Gross) /-</u></h4>
+       
+        <hr />
+        <table class="HeadTbl" width="100%">
+            <tr>
+                <td>Bank A/C:</td>
+                <td>@ViewBag.Inv.Banks.ACno</td>
+                <td>Net Total:</td>
+                <td class="showright">@String.Format("{0:0.00}", tot)</td>
+            </tr>
+            <tr>
+                <td>Bank IFSC:</td>
+                <td>@ViewBag.Inv.Banks.IFSC</td>
+                <td>Add IGST:</td>
+                <td class="showright">@String.Format("{0:0.00}", ttax)</td>
+            </tr>
+            <tr>
+                <td>GST on Reverse Charge:</td>
+                <td>@ViewBag.Inv.RevChrg</td>
+                <td>Gross Total:</td>
+                <td class="showright">@String.Format("{0:0.00}", tot + ttax)</td>
+            </tr>
+        </table>
+        
+        
     </div>

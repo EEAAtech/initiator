@@ -7,10 +7,27 @@ using System.Web;
 
 namespace IncredibleInvoicer
 {
+    public class BanksMetadata
+    {
+        [Display(Name = "Bank Name")]
+        [Required]
+        [StringLength(50, MinimumLength = 3)]
+        public string BankName;
+
+        [Display(Name = "Bank A/C")]
+        [Required]
+        [StringLength(30, MinimumLength = 3)]
+        public string ACno;
+
+        [Display(Name = "Bank IFSC")]
+        [Required]
+        [StringLength(30, MinimumLength = 3)]
+        public string IFSC;
+    }
 
     public class CustomerMetadata
     {
-        
+        [Display(Name = "Company/Hotel Name")]
         [Required]
         [StringLength(150, MinimumLength = 3)]
         public string Name;
@@ -25,9 +42,12 @@ namespace IncredibleInvoicer
         [StringLength(150, MinimumLength = 3)]
         public string Address2;
 
-        [Display(Name = "Tax No.")]        
+        [Display(Name = "GSTIN")]        
         [StringLength(50, MinimumLength = 3)]
         public string TaxNo;
+
+        [Display(Name = "Contact Person")]
+        public string Contact;
 
         [Display(Name = "Contact Number")]
         [Required]
@@ -68,12 +88,7 @@ namespace IncredibleInvoicer
         [Display(Name = "PO Number")]        
         [StringLength(50, MinimumLength = 3)]
         public string POno;
-
-        [Display(Name = "Tax %")]
-        [Required]
-        public int TaxID;
-
-        
+                  
     }
 
     public  class StateMetadata
@@ -93,7 +108,7 @@ namespace IncredibleInvoicer
         [Display(Name = "Tax Percentage")]
         [Required]
         [Range(0.0, Double.MaxValue)]
-        public decimal Tax1;
+        public decimal Tax;
     }
 
     public class UnitMetadata

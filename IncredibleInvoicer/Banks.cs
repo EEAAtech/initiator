@@ -12,24 +12,20 @@ namespace IncredibleInvoicer
     using System;
     using System.Collections.Generic;
     
-    public partial class Item
+    public partial class Banks
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Item()
+        public Banks()
         {
-            this.InvoiceDetails = new HashSet<InvoiceDetail>();
+            this.Invoices = new HashSet<Invoices>();
         }
     
-        public int ItemID { get; set; }
-        public string Item1 { get; set; }
-        public Nullable<int> CustomerID { get; set; }
-        public Nullable<decimal> Qty { get; set; }
-        public Nullable<int> UnitID { get; set; }
-        public Nullable<decimal> Rate { get; set; }
+        public int BankID { get; set; }
+        public string BankName { get; set; }
+        public string ACno { get; set; }
+        public string IFSC { get; set; }
     
-        public virtual Customer Customer { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<InvoiceDetail> InvoiceDetails { get; set; }
-        public virtual Unit Unit { get; set; }
+        public virtual ICollection<Invoices> Invoices { get; set; }
     }
 }

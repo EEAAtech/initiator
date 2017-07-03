@@ -5,6 +5,15 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="IncredibleInvoicerModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Banks">
+          <Key>
+            <PropertyRef Name="BankID" />
+          </Key>
+          <Property Name="BankID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BankName" Type="varchar" MaxLength="50" />
+          <Property Name="ACno" Type="varchar" MaxLength="30" />
+          <Property Name="IFSC" Type="varchar" MaxLength="30" />
+        </EntityType>
         <EntityType Name="Customers">
           <Key>
             <PropertyRef Name="CustomerID" />
@@ -30,6 +39,10 @@
           <Property Name="Qty" Type="decimal" Precision="18" Scale="2" />
           <Property Name="UnitID" Type="int" />
           <Property Name="Rate" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="Discount" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="TaxID" Type="int" />
+          <Property Name="Disc" Type="varchar" MaxLength="50" />
+          <Property Name="HSNCode" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Invoices">
           <Key>
@@ -40,8 +53,10 @@
           <Property Name="POno" Type="varchar" MaxLength="50" />
           <Property Name="POdate" Type="date" />
           <Property Name="CustomerID" Type="int" />
-          <Property Name="TaxID" Type="int" />
           <Property Name="FriendlyID" Type="varchar" MaxLength="10" />
+          <Property Name="ReverseCharge" Type="bit" Nullable="false" />
+          <Property Name="BankID" Type="int" Nullable="false" />
+          <Property Name="RevChrg" Type="decimal" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="InvYrs">
           <Key>
@@ -60,6 +75,7 @@
           <Property Name="Qty" Type="decimal" Precision="18" Scale="2" />
           <Property Name="UnitID" Type="int" />
           <Property Name="Rate" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="HSNCode" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="States">
           <Key>
@@ -130,6 +146,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Invoices_ToBank">
+          <End Role="Banks" Type="Self.Banks" Multiplicity="1" />
+          <End Role="Invoices" Type="Self.Invoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Banks">
+              <PropertyRef Name="BankID" />
+            </Principal>
+            <Dependent Role="Invoices">
+              <PropertyRef Name="BankID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Invoices_ToCustomers">
           <End Role="Customers" Type="Self.Customers" Multiplicity="0..1" />
           <End Role="Invoices" Type="Self.Invoices" Multiplicity="*" />
@@ -144,12 +172,12 @@
         </Association>
         <Association Name="FK_Invoices_ToTaxes">
           <End Role="Taxes" Type="Self.Taxes" Multiplicity="0..1" />
-          <End Role="Invoices" Type="Self.Invoices" Multiplicity="*" />
+          <End Role="InvoiceDetails" Type="Self.InvoiceDetails" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Taxes">
               <PropertyRef Name="TaxID" />
             </Principal>
-            <Dependent Role="Invoices">
+            <Dependent Role="InvoiceDetails">
               <PropertyRef Name="TaxID" />
             </Dependent>
           </ReferentialConstraint>
@@ -179,6 +207,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="IncredibleInvoicerModelStoreContainer">
+          <EntitySet Name="Banks" EntityType="Self.Banks" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Customers" EntityType="Self.Customers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Invoices" EntityType="Self.Invoices" Schema="dbo" store:Type="Tables" />
@@ -203,13 +232,17 @@
             <End Role="Units" EntitySet="Units" />
             <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invoices_ToBank" Association="Self.FK_Invoices_ToBank">
+            <End Role="Banks" EntitySet="Banks" />
+            <End Role="Invoices" EntitySet="Invoices" />
+          </AssociationSet>
           <AssociationSet Name="FK_Invoices_ToCustomers" Association="Self.FK_Invoices_ToCustomers">
             <End Role="Customers" EntitySet="Customers" />
             <End Role="Invoices" EntitySet="Invoices" />
           </AssociationSet>
           <AssociationSet Name="FK_Invoices_ToTaxes" Association="Self.FK_Invoices_ToTaxes">
             <End Role="Taxes" EntitySet="Taxes" />
-            <End Role="Invoices" EntitySet="Invoices" />
+            <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
           </AssociationSet>
           <AssociationSet Name="FK_Items_ToCustomers" Association="Self.FK_Items_ToCustomers">
             <End Role="Customers" EntitySet="Customers" />
@@ -239,8 +272,8 @@
           <Property Name="ContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Note" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="State" Relationship="IncredibleInvoicerModel.FK_Customers_ToState" FromRole="Customer" ToRole="State" />
-          <NavigationProperty Name="Invoices" Relationship="IncredibleInvoicerModel.FK_Invoices_ToCustomers" FromRole="Customer" ToRole="Invoice" />
-          <NavigationProperty Name="Items" Relationship="IncredibleInvoicerModel.FK_Items_ToCustomers" FromRole="Customer" ToRole="Item" />
+          <NavigationProperty Name="Invoices" Relationship="IncredibleInvoicerModel.FK_Invoices_ToCustomers" FromRole="Customer" ToRole="Invoices" />
+          <NavigationProperty Name="Items" Relationship="IncredibleInvoicerModel.FK_Items_ToCustomers" FromRole="Customer" ToRole="Items" />
         </EntityType>
         <EntityType Name="State">
           <Key>
@@ -257,7 +290,7 @@
           <Property Name="UnitID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Unit1" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
           <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToUnits" FromRole="Unit" ToRole="InvoiceDetail" />
-          <NavigationProperty Name="Items" Relationship="IncredibleInvoicerModel.FK_Items_ToUnits" FromRole="Unit" ToRole="Item" />
+          <NavigationProperty Name="Items" Relationship="IncredibleInvoicerModel.FK_Items_ToUnits" FromRole="Unit" ToRole="Items" />
         </EntityType>
         <EntityContainer Name="IncredibleInvoicerEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Customers" EntityType="Self.Customer" />
@@ -267,39 +300,44 @@
             <End Role="State" EntitySet="States" />
             <End Role="Customer" EntitySet="Customers" />
           </AssociationSet>
-          <EntitySet Name="Invoices" EntityType="IncredibleInvoicerModel.Invoice" />
-          <EntitySet Name="Taxes" EntityType="IncredibleInvoicerModel.Tax" />
-          <AssociationSet Name="FK_Invoices_ToCustomers" Association="IncredibleInvoicerModel.FK_Invoices_ToCustomers">
-            <End Role="Customer" EntitySet="Customers" />
-            <End Role="Invoice" EntitySet="Invoices" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoices_ToTaxes" Association="IncredibleInvoicerModel.FK_Invoices_ToTaxes">
-            <End Role="Tax" EntitySet="Taxes" />
-            <End Role="Invoice" EntitySet="Invoices" />
-          </AssociationSet>
           <EntitySet Name="InvoiceDetails" EntityType="IncredibleInvoicerModel.InvoiceDetail" />
-          <AssociationSet Name="FK_InvDet_ToInvoice" Association="IncredibleInvoicerModel.FK_InvDet_ToInvoice">
-            <End Role="Invoice" EntitySet="Invoices" />
-            <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
-          </AssociationSet>
           <AssociationSet Name="FK_InvDet_ToUnits" Association="IncredibleInvoicerModel.FK_InvDet_ToUnits">
             <End Role="Unit" EntitySet="Units" />
             <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
           </AssociationSet>
-          <EntitySet Name="Items" EntityType="IncredibleInvoicerModel.Item" />
+          <EntitySet Name="InvYrs" EntityType="IncredibleInvoicerModel.InvYr" />
+          <EntitySet Name="Banks" EntityType="IncredibleInvoicerModel.Banks" />
+          <EntitySet Name="Invoices" EntityType="IncredibleInvoicerModel.Invoices" />
+          <EntitySet Name="Taxes" EntityType="IncredibleInvoicerModel.Taxes" />
+          <AssociationSet Name="FK_Invoices_ToBank" Association="IncredibleInvoicerModel.FK_Invoices_ToBank">
+            <End Role="Banks" EntitySet="Banks" />
+            <End Role="Invoices" EntitySet="Invoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoices_ToCustomers" Association="IncredibleInvoicerModel.FK_Invoices_ToCustomers">
+            <End Role="Customer" EntitySet="Customers" />
+            <End Role="Invoices" EntitySet="Invoices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InvDet_ToInvoice" Association="IncredibleInvoicerModel.FK_InvDet_ToInvoice">
+            <End Role="Invoices" EntitySet="Invoices" />
+            <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoices_ToTaxes" Association="IncredibleInvoicerModel.FK_Invoices_ToTaxes">
+            <End Role="Taxes" EntitySet="Taxes" />
+            <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
+          </AssociationSet>
+          <EntitySet Name="Items" EntityType="IncredibleInvoicerModel.Items" />
           <AssociationSet Name="FK_Items_ToCustomers" Association="IncredibleInvoicerModel.FK_Items_ToCustomers">
             <End Role="Customer" EntitySet="Customers" />
-            <End Role="Item" EntitySet="Items" />
+            <End Role="Items" EntitySet="Items" />
           </AssociationSet>
           <AssociationSet Name="FK_InvDet_ToItem" Association="IncredibleInvoicerModel.FK_InvDet_ToItem">
-            <End Role="Item" EntitySet="Items" />
+            <End Role="Items" EntitySet="Items" />
             <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
           </AssociationSet>
           <AssociationSet Name="FK_Items_ToUnits" Association="IncredibleInvoicerModel.FK_Items_ToUnits">
             <End Role="Unit" EntitySet="Units" />
-            <End Role="Item" EntitySet="Items" />
+            <End Role="Items" EntitySet="Items" />
           </AssociationSet>
-          <EntitySet Name="InvYrs" EntityType="IncredibleInvoicerModel.InvYr" />
         </EntityContainer>
         <Association Name="FK_Customers_ToState">
           <End Type="IncredibleInvoicerModel.State" Role="State" Multiplicity="0..1" />
@@ -313,53 +351,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Invoice">
-          <Key>
-            <PropertyRef Name="InvoiceID" />
-          </Key>
-          <Property Name="InvoiceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="InvDate" Type="DateTime" Precision="0" />
-          <Property Name="POno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="POdate" Type="DateTime" Precision="0" />
-          <Property Name="CustomerID" Type="Int32" />
-          <Property Name="TaxID" Type="Int32" />
-          <NavigationProperty Name="Customer" Relationship="IncredibleInvoicerModel.FK_Invoices_ToCustomers" FromRole="Invoice" ToRole="Customer" />
-          <NavigationProperty Name="Tax" Relationship="IncredibleInvoicerModel.FK_Invoices_ToTaxes" FromRole="Invoice" ToRole="Tax" />
-          <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToInvoice" FromRole="Invoice" ToRole="InvoiceDetail" />
-          <Property Name="FriendlyID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="Tax">
-          <Key>
-            <PropertyRef Name="TaxID" />
-          </Key>
-          <Property Name="TaxID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Tax1" Type="Decimal" Precision="18" Scale="2" />
-          <NavigationProperty Name="Invoices" Relationship="IncredibleInvoicerModel.FK_Invoices_ToTaxes" FromRole="Tax" ToRole="Invoice" />
-        </EntityType>
-        <Association Name="FK_Invoices_ToCustomers">
-          <End Type="IncredibleInvoicerModel.Customer" Role="Customer" Multiplicity="0..1" />
-          <End Type="IncredibleInvoicerModel.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Customer">
-              <PropertyRef Name="CustomerID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="CustomerID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoices_ToTaxes">
-          <End Type="IncredibleInvoicerModel.Tax" Role="Tax" Multiplicity="0..1" />
-          <End Type="IncredibleInvoicerModel.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Tax">
-              <PropertyRef Name="TaxID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="TaxID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="InvoiceDetail">
           <Key>
             <PropertyRef Name="InvoiceDetailID" />
@@ -370,22 +361,15 @@
           <Property Name="Qty" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="UnitID" Type="Int32" />
           <Property Name="Rate" Type="Decimal" Precision="18" Scale="2" />
-          <NavigationProperty Name="Invoice" Relationship="IncredibleInvoicerModel.FK_InvDet_ToInvoice" FromRole="InvoiceDetail" ToRole="Invoice" />
           <NavigationProperty Name="Unit" Relationship="IncredibleInvoicerModel.FK_InvDet_ToUnits" FromRole="InvoiceDetail" ToRole="Unit" />
-          <NavigationProperty Name="Item" Relationship="IncredibleInvoicerModel.FK_InvDet_ToItem" FromRole="InvoiceDetail" ToRole="Item" />
+          <Property Name="Discount" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="TaxID" Type="Int32" />
+          <Property Name="Disc" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoices" Relationship="IncredibleInvoicerModel.FK_InvDet_ToInvoice" FromRole="InvoiceDetail" ToRole="Invoices" />
+          <NavigationProperty Name="Taxes" Relationship="IncredibleInvoicerModel.FK_Invoices_ToTaxes" FromRole="InvoiceDetail" ToRole="Taxes" />
+          <Property Name="HSNCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Items" Relationship="IncredibleInvoicerModel.FK_InvDet_ToItem" FromRole="InvoiceDetail" ToRole="Items" />
         </EntityType>
-        <Association Name="FK_InvDet_ToInvoice">
-          <End Type="IncredibleInvoicerModel.Invoice" Role="Invoice" Multiplicity="0..1" />
-          <End Type="IncredibleInvoicerModel.InvoiceDetail" Role="InvoiceDetail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Invoice">
-              <PropertyRef Name="InvoiceID" />
-            </Principal>
-            <Dependent Role="InvoiceDetail">
-              <PropertyRef Name="InvoiceID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_InvDet_ToUnits">
           <End Type="IncredibleInvoicerModel.Unit" Role="Unit" Multiplicity="0..1" />
           <End Type="IncredibleInvoicerModel.InvoiceDetail" Role="InvoiceDetail" Multiplicity="*" />
@@ -398,37 +382,128 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Item">
+        <EntityType Name="InvYr">
           <Key>
-            <PropertyRef Name="ItemID" />
+            <PropertyRef Name="Year" />
           </Key>
-          <Property Name="ItemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Item1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="CustomerID" Type="Int32" />
-          <Property Name="Qty" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="UnitID" Type="Int32" />
-          <Property Name="Rate" Type="Decimal" Precision="18" Scale="2" />
-          <NavigationProperty Name="Customer" Relationship="IncredibleInvoicerModel.FK_Items_ToCustomers" FromRole="Item" ToRole="Customer" />
-          <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToItem" FromRole="Item" ToRole="InvoiceDetail" />
-          <NavigationProperty Name="Unit" Relationship="IncredibleInvoicerModel.FK_Items_ToUnits" FromRole="Item" ToRole="Unit" />
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="InvLastNumber" Type="Int32" Nullable="false" />
         </EntityType>
-        <Association Name="FK_Items_ToCustomers">
+        <EntityType Name="Banks">
+          <Key>
+            <PropertyRef Name="BankID" />
+          </Key>
+          <Property Name="BankID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BankName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ACno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="IFSC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoices" Relationship="IncredibleInvoicerModel.FK_Invoices_ToBank" FromRole="Banks" ToRole="Invoices" />
+        </EntityType>
+        <EntityType Name="Invoices">
+          <Key>
+            <PropertyRef Name="InvoiceID" />
+          </Key>
+          <Property Name="InvoiceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="InvDate" Type="DateTime" Precision="0" />
+          <Property Name="POno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="POdate" Type="DateTime" Precision="0" />
+          <Property Name="CustomerID" Type="Int32" />
+          <Property Name="FriendlyID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ReverseCharge" Type="Boolean" Nullable="false" />
+          <Property Name="BankID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Banks" Relationship="IncredibleInvoicerModel.FK_Invoices_ToBank" FromRole="Invoices" ToRole="Banks" />
+          <NavigationProperty Name="Customers" Relationship="IncredibleInvoicerModel.FK_Invoices_ToCustomers" FromRole="Invoices" ToRole="Customer" />
+          <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToInvoice" FromRole="Invoices" ToRole="InvoiceDetail" />
+          <Property Name="RevChrg" Type="Decimal" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="Taxes">
+          <Key>
+            <PropertyRef Name="TaxID" />
+          </Key>
+          <Property Name="TaxID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Tax" Type="Decimal" Precision="18" Scale="2" />
+          <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_Invoices_ToTaxes" FromRole="Taxes" ToRole="InvoiceDetail" />
+        </EntityType>
+        <Association Name="FK_Invoices_ToBank">
+          <End Type="IncredibleInvoicerModel.Banks" Role="Banks" Multiplicity="1" />
+          <End Type="IncredibleInvoicerModel.Invoices" Role="Invoices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Banks">
+              <PropertyRef Name="BankID" />
+            </Principal>
+            <Dependent Role="Invoices">
+              <PropertyRef Name="BankID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoices_ToCustomers">
           <End Type="IncredibleInvoicerModel.Customer" Role="Customer" Multiplicity="0..1" />
-          <End Type="IncredibleInvoicerModel.Item" Role="Item" Multiplicity="*" />
+          <End Type="IncredibleInvoicerModel.Invoices" Role="Invoices" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Customer">
               <PropertyRef Name="CustomerID" />
             </Principal>
-            <Dependent Role="Item">
+            <Dependent Role="Invoices">
+              <PropertyRef Name="CustomerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InvDet_ToInvoice">
+          <End Type="IncredibleInvoicerModel.Invoices" Role="Invoices" Multiplicity="0..1" />
+          <End Type="IncredibleInvoicerModel.InvoiceDetail" Role="InvoiceDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Invoices">
+              <PropertyRef Name="InvoiceID" />
+            </Principal>
+            <Dependent Role="InvoiceDetail">
+              <PropertyRef Name="InvoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoices_ToTaxes">
+          <End Type="IncredibleInvoicerModel.Taxes" Role="Taxes" Multiplicity="0..1" />
+          <End Type="IncredibleInvoicerModel.InvoiceDetail" Role="InvoiceDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Taxes">
+              <PropertyRef Name="TaxID" />
+            </Principal>
+            <Dependent Role="InvoiceDetail">
+              <PropertyRef Name="TaxID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Items">
+          <Key>
+            <PropertyRef Name="ItemID" />
+          </Key>
+          <Property Name="ItemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Item" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerID" Type="Int32" />
+          <Property Name="Qty" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="UnitID" Type="Int32" />
+          <Property Name="Rate" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="HSNCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Customers" Relationship="IncredibleInvoicerModel.FK_Items_ToCustomers" FromRole="Items" ToRole="Customer" />
+          <NavigationProperty Name="InvoiceDetails" Relationship="IncredibleInvoicerModel.FK_InvDet_ToItem" FromRole="Items" ToRole="InvoiceDetail" />
+          <NavigationProperty Name="Units" Relationship="IncredibleInvoicerModel.FK_Items_ToUnits" FromRole="Items" ToRole="Unit" />
+        </EntityType>
+        <Association Name="FK_Items_ToCustomers">
+          <End Type="IncredibleInvoicerModel.Customer" Role="Customer" Multiplicity="0..1" />
+          <End Type="IncredibleInvoicerModel.Items" Role="Items" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Customer">
+              <PropertyRef Name="CustomerID" />
+            </Principal>
+            <Dependent Role="Items">
               <PropertyRef Name="CustomerID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_InvDet_ToItem">
-          <End Type="IncredibleInvoicerModel.Item" Role="Item" Multiplicity="0..1" />
+          <End Type="IncredibleInvoicerModel.Items" Role="Items" Multiplicity="0..1" />
           <End Type="IncredibleInvoicerModel.InvoiceDetail" Role="InvoiceDetail" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Item">
+            <Principal Role="Items">
               <PropertyRef Name="ItemID" />
             </Principal>
             <Dependent Role="InvoiceDetail">
@@ -438,23 +513,16 @@
         </Association>
         <Association Name="FK_Items_ToUnits">
           <End Type="IncredibleInvoicerModel.Unit" Role="Unit" Multiplicity="0..1" />
-          <End Type="IncredibleInvoicerModel.Item" Role="Item" Multiplicity="*" />
+          <End Type="IncredibleInvoicerModel.Items" Role="Items" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Unit">
               <PropertyRef Name="UnitID" />
             </Principal>
-            <Dependent Role="Item">
+            <Dependent Role="Items">
               <PropertyRef Name="UnitID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="InvYr">
-          <Key>
-            <PropertyRef Name="Year" />
-          </Key>
-          <Property Name="Year" Type="Int32" Nullable="false" />
-          <Property Name="InvLastNumber" Type="Int32" Nullable="false" />
-        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -493,30 +561,13 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Invoices">
-            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Invoice">
-              <MappingFragment StoreEntitySet="Invoices">
-                <ScalarProperty Name="FriendlyID" ColumnName="FriendlyID" />
-                <ScalarProperty Name="TaxID" ColumnName="TaxID" />
-                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
-                <ScalarProperty Name="POdate" ColumnName="POdate" />
-                <ScalarProperty Name="POno" ColumnName="POno" />
-                <ScalarProperty Name="InvDate" ColumnName="InvDate" />
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Taxes">
-            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Tax">
-              <MappingFragment StoreEntitySet="Taxes">
-                <ScalarProperty Name="Tax1" ColumnName="Tax" />
-                <ScalarProperty Name="TaxID" ColumnName="TaxID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="InvoiceDetails">
             <EntityTypeMapping TypeName="IncredibleInvoicerModel.InvoiceDetail">
               <MappingFragment StoreEntitySet="InvoiceDetails">
+                <ScalarProperty Name="HSNCode" ColumnName="HSNCode" />
+                <ScalarProperty Name="Disc" ColumnName="Disc" />
+                <ScalarProperty Name="TaxID" ColumnName="TaxID" />
+                <ScalarProperty Name="Discount" ColumnName="Discount" />
                 <ScalarProperty Name="Rate" ColumnName="Rate" />
                 <ScalarProperty Name="UnitID" ColumnName="UnitID" />
                 <ScalarProperty Name="Qty" ColumnName="Qty" />
@@ -526,23 +577,57 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Items">
-            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Item">
-              <MappingFragment StoreEntitySet="Items">
-                <ScalarProperty Name="Rate" ColumnName="Rate" />
-                <ScalarProperty Name="UnitID" ColumnName="UnitID" />
-                <ScalarProperty Name="Qty" ColumnName="Qty" />
-                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
-                <ScalarProperty Name="Item1" ColumnName="Item" />
-                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="InvYrs">
             <EntityTypeMapping TypeName="IncredibleInvoicerModel.InvYr">
               <MappingFragment StoreEntitySet="InvYrs">
                 <ScalarProperty Name="InvLastNumber" ColumnName="InvLastNumber" />
                 <ScalarProperty Name="Year" ColumnName="Year" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Banks">
+            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Banks">
+              <MappingFragment StoreEntitySet="Banks">
+                <ScalarProperty Name="IFSC" ColumnName="IFSC" />
+                <ScalarProperty Name="ACno" ColumnName="ACno" />
+                <ScalarProperty Name="BankName" ColumnName="BankName" />
+                <ScalarProperty Name="BankID" ColumnName="BankID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Invoices">
+            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Invoices">
+              <MappingFragment StoreEntitySet="Invoices">
+                <ScalarProperty Name="RevChrg" ColumnName="RevChrg" />
+                <ScalarProperty Name="BankID" ColumnName="BankID" />
+                <ScalarProperty Name="ReverseCharge" ColumnName="ReverseCharge" />
+                <ScalarProperty Name="FriendlyID" ColumnName="FriendlyID" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="POdate" ColumnName="POdate" />
+                <ScalarProperty Name="POno" ColumnName="POno" />
+                <ScalarProperty Name="InvDate" ColumnName="InvDate" />
+                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Taxes">
+            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Taxes">
+              <MappingFragment StoreEntitySet="Taxes">
+                <ScalarProperty Name="Tax" ColumnName="Tax" />
+                <ScalarProperty Name="TaxID" ColumnName="TaxID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Items">
+            <EntityTypeMapping TypeName="IncredibleInvoicerModel.Items">
+              <MappingFragment StoreEntitySet="Items">
+                <ScalarProperty Name="HSNCode" ColumnName="HSNCode" />
+                <ScalarProperty Name="Rate" ColumnName="Rate" />
+                <ScalarProperty Name="UnitID" ColumnName="UnitID" />
+                <ScalarProperty Name="Qty" ColumnName="Qty" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="Item" ColumnName="Item" />
+                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -560,7 +645,7 @@
     <Options>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
-        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />

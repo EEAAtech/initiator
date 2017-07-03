@@ -36,7 +36,10 @@
         $('*[data-autocomplete-url]')
             .each(function () {
                 $(this).autocomplete({
-                    source: $(this).data("autocomplete-url")
+                    source: $(this).data("autocomplete-url"),
+                    select: function (event, ui) {
+                        $('#HSNCode').val(ui.item.HSNCode)
+                    }
                 });
             });
     });

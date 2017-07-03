@@ -196,11 +196,14 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Banks.cs">
+      <DependentUpon>IncInvMdl.tt</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BanksController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\EAController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\InvoiceDetailsController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\StatesController.cs" />
@@ -227,16 +230,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IncInvMdl.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Invoice.cs">
+    <Compile Include="InvoiceDetail.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
-    <Compile Include="InvoiceDetail.cs">
+    <Compile Include="Invoices.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
     <Compile Include="InvYr.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
-    <Compile Include="Item.cs">
+    <Compile Include="Items.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
@@ -250,7 +253,7 @@
     <Compile Include="State.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
-    <Compile Include="Tax.cs">
+    <Compile Include="Taxes.cs">
       <DependentUpon>IncInvMdl.tt</DependentUpon>
     </Compile>
     <Compile Include="Unit.cs">
@@ -419,24 +422,24 @@
     <Content Include="Views\Units\Details.cshtml" />
     <Content Include="Views\Units\Edit.cshtml" />
     <Content Include="Views\Units\Index.cshtml" />
-    <Content Include="Views\Taxes\Create.cshtml" />
-    <Content Include="Views\Taxes\Delete.cshtml" />
-    <Content Include="Views\Taxes\Details.cshtml" />
-    <Content Include="Views\Taxes\Edit.cshtml" />
-    <Content Include="Views\Taxes\Index.cshtml" />
     <Content Include="Views\Invoices\Create.cshtml" />
     <Content Include="Views\Invoices\Delete.cshtml" />
     <Content Include="Views\Invoices\Details.cshtml" />
     <Content Include="Views\Invoices\Edit.cshtml" />
     <Content Include="Views\Invoices\Index.cshtml" />
-    <Content Include="Views\InvoiceDetails\Create.cshtml" />
-    <Content Include="Views\InvoiceDetails\Delete.cshtml" />
-    <Content Include="Views\InvoiceDetails\Details.cshtml" />
-    <Content Include="Views\InvoiceDetails\Edit.cshtml" />
-    <Content Include="Views\InvoiceDetails\Index.cshtml" />
     <Content Include="Views\Invoices\InvoicesReport.cshtml" />
     <Content Include="Views\Invoices\RptRq.cshtml" />
     <Content Include="Views\Invoices\SummaryReport.cshtml" />
+    <Content Include="Views\Banks\Create.cshtml" />
+    <Content Include="Views\Banks\Delete.cshtml" />
+    <Content Include="Views\Banks\Details.cshtml" />
+    <Content Include="Views\Banks\Edit.cshtml" />
+    <Content Include="Views\Banks\Index.cshtml" />
+    <Content Include="Views\Taxes\Create.cshtml" />
+    <Content Include="Views\Taxes\Delete.cshtml" />
+    <Content Include="Views\Taxes\Details.cshtml" />
+    <Content Include="Views\Taxes\Edit.cshtml" />
+    <Content Include="Views\Taxes\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

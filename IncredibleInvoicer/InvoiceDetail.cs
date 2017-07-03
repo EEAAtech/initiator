@@ -20,9 +20,14 @@ namespace IncredibleInvoicer
         public Nullable<decimal> Qty { get; set; }
         public Nullable<int> UnitID { get; set; }
         public Nullable<decimal> Rate { get; set; }
+        public Nullable<decimal> Discount { get; set; }
+        public Nullable<int> TaxID { get; set; }
+        public string Disc { get; set; }
+        public string HSNCode { get; set; }
     
-        public virtual Invoice Invoice { get; set; }
         public virtual Unit Unit { get; set; }
-        public virtual Item Item { get; set; }
+        public virtual Invoices Invoices { get; set; }
+        public virtual Taxes Taxes { get; set; }
+        public virtual Items Items { get; set; }
     }
 }

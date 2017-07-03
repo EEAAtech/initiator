@@ -18,7 +18,7 @@ namespace IncredibleInvoicer.Controllers
         // GET: Invoices
         public ActionResult Index(int? page)
         {
-            var invoices = db.Invoices.Include(i => i.Customer).Include(i => i.Tax);
+            var invoices = db.Invoices.Include(i => i.Customers);
 
             int pageSize = 15;
             int pageNumber = (page ?? 1);
@@ -29,7 +29,7 @@ namespace IncredibleInvoicer.Controllers
         // GET: Invoices report Request
         public ActionResult InvoiceRpt()
         {
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1");
+            
             ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name");
             ViewBag.ReturnAction = "InvoicesReport";
             return View("RptRq");
@@ -44,7 +44,7 @@ namespace IncredibleInvoicer.Controllers
             DateTime Fd = DateTime.Parse(fm["FromDt"]);
             DateTime Td = DateTime.Parse(fm["ToDt"]);
 
-            var invoices = db.Invoices.Where(i => i.InvDate > Fd && i.InvDate < Td);
+            var invoices = db.Invoices.Where(i => i.InvDate > Fd && i.InvDate < Td && i.ReverseCharge==false);
 
             if (fm["CustomerID"] != "")
             {
@@ -52,11 +52,7 @@ namespace IncredibleInvoicer.Controllers
                 invoices = invoices.Where(i => i.CustomerID == cid);
             }
 
-            if (fm["TaxID"] != "")
-            {
-                var tid = int.Parse(fm["TaxID"]);
-                invoices = invoices.Where(i => i.TaxID == tid);
-            }
+            
 
             invoices = invoices.Include(i => i.InvoiceDetails);
             ViewBag.FromDt = Fd;
@@ -67,7 +63,7 @@ namespace IncredibleInvoicer.Controllers
         // GET: Summary report Request
         public ActionResult SummaryRpt()
         {
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1");
+            
             ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name");
             ViewBag.ReturnAction = "SummaryReport";
             return View("RptRq");
@@ -83,8 +79,8 @@ namespace IncredibleInvoicer.Controllers
             DateTime Td = DateTime.Parse(fm["ToDt"]);
 
 
-            string str = "WITH cteInvTots (InvoiceID, Net) AS " +
-                " (SELECT InvoiceID, SUM(Qty * Rate) as Net FROM InvoiceDetails WHERE InvoiceID IN(SELECT InvoiceID FROM Invoices WHERE InvDate BETWEEN " + string.Format("'{0:yyyy-MM-dd}' AND '{1:yyyy-MM-dd}' ", Fd, Td);
+            string str = "WITH cteInvTots (InvoiceID, Net, TaxAmt) AS " +
+                " (SELECT InvoiceID, SUM(Qty * Rate) - SUM(COALESCE(Discount,0)) as Net, (SUM((Qty * Rate)* (t.Tax/100)) - SUM(COALESCE(Discount,0))) as TaxAmt FROM InvoiceDetails ids, Taxes t WHERE ids.TaxID=t.TaxID AND InvoiceID IN(SELECT InvoiceID FROM Invoices WHERE ReverseCharge=0 AND InvDate BETWEEN " + string.Format("'{0:yyyy-MM-dd}' AND '{1:yyyy-MM-dd}' ", Fd, Td);
 
             if (fm["CustomerID"] != "")
             {
@@ -92,14 +88,9 @@ namespace IncredibleInvoicer.Controllers
                 str += " AND CustomerID = " + cid;
             }
 
-            if (fm["TaxID"] != "")
-            {
-                var tid = int.Parse(fm["TaxID"]);
-                str += " AND TaxID = " + tid;
-            }
-
-            str += " ) GROUP BY InvoiceID) SELECT YEAR(i.InvDate) as yr, MONTH(i.InvDate) as mont, COUNT(*) as cont, SUM(c.Net) as net, SUM(c.Net * (t.Tax / 100)) as ctax " +
-                " FROM Invoices i, cteinvTots c, Taxes t WHERE i.InvoiceID = c.InvoiceID AND i.TaxID = t.TaxID " +
+            
+            str += " ) GROUP BY InvoiceID) SELECT YEAR(i.InvDate) as yr, MONTH(i.InvDate) as mont, COUNT(*) as cont, SUM(c.Net) as net, SUM(c.TaxAmt) as ctax " +
+                " FROM Invoices i, cteinvTots c WHERE i.InvoiceID = c.InvoiceID " +
                 " GROUP BY YEAR(i.InvDate), MONTH(i.InvDate)";
 
             IEnumerable<SummaryRptData> todt = db.Database.SqlQuery<SummaryRptData>(str).ToList();
@@ -118,16 +109,16 @@ namespace IncredibleInvoicer.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Invoice invoice = db.Invoices.Find(id);
+            Invoices invoice = db.Invoices.Find(id);
             if (invoice == null)
             {
                 return HttpNotFound();
             }
 
             ViewBag.Inv = invoice;
-            ViewBag.InvDet = db.InvoiceDetails.Where(ivd => ivd.InvoiceID == id).ToList();
+            ViewBag.InvDet = db.InvoiceDetails.Where(ivd => ivd.InvoiceID == id).Include(t => t.Taxes).ToList();
             ViewBag.UnitID = new SelectList(db.Units, "UnitID", "Unit1");
-            
+            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax");
 
             return View();
         }
@@ -136,8 +127,8 @@ namespace IncredibleInvoicer.Controllers
         public ActionResult AutoComplete(string term)
         {
             var filteredItems = db.Items.Where(
-            item => item.Item1.Contains(term)
-            ).Select(i => i.Item1);
+            item => item.Item.Contains(term)
+            ).Select(i => new { value = i.Item, HSNCode = i.HSNCode });
 
             //var items = new[] {"Apple", "Pear", "Banana", "Pineapple", "Peach"};
             //var filteredItems = items.Where(
@@ -170,37 +161,45 @@ namespace IncredibleInvoicer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateDet([Bind(Include = "InvoiceDetailID,InvoiceID,Item,Qty,UnitID,Rate")] InvoiceDetailStr invoiceDetail)
+        public ActionResult CreateDet([Bind(Include = "InvoiceDetailID,InvoiceID,Item,Qty,UnitID,Rate, TaxID, Disc, HSNCode, Discount")] InvoiceDetailStr invoiceDetail)
         {
+
             if (ModelState.IsValid)
             {
-                Item itm;
+                Items itm;
 
                 //If this item doesnt already exists create it
-                if (!db.Items.Any(i => i.Item1.Contains(invoiceDetail.Item)))
+                if (!db.Items.Any(i => i.Item.Contains(invoiceDetail.Item)))
                 {
-                    itm = new Item { Item1 = invoiceDetail.Item };
+                    itm = new Items { Item = invoiceDetail.Item, HSNCode = invoiceDetail.HSNCode };
                     db.Items.Add(itm);
-                    db.SaveChanges();
                 }
                 else
-                    itm = db.Items.FirstOrDefault(i => i.Item1.Contains(invoiceDetail.Item));
+                {
+                    itm = db.Items.FirstOrDefault(i => i.Item.Contains(invoiceDetail.Item));
+                    itm.HSNCode = invoiceDetail.HSNCode;
+                    db.Entry(itm).State = EntityState.Modified;                    
+                }
+                    db.SaveChanges();
 
-                InvoiceDetail invd = new InvoiceDetail { InvoiceID = invoiceDetail.InvoiceID, ItemID = itm.ItemID, Qty = invoiceDetail.Qty, UnitID = invoiceDetail.UnitID, Rate = invoiceDetail.Rate };
+                InvoiceDetail invd = new InvoiceDetail { InvoiceID = invoiceDetail.InvoiceID, ItemID = itm.ItemID, Qty = invoiceDetail.Qty, UnitID = invoiceDetail.UnitID, Rate = invoiceDetail.Rate, Disc=invoiceDetail.Disc,Discount= invoiceDetail.Discount,HSNCode= invoiceDetail.HSNCode,TaxID= invoiceDetail.TaxID };
                 db.InvoiceDetails.Add(invd);
                 db.SaveChanges();
                 return RedirectToAction("Details", new { id = invd.InvoiceID });
             }
                         
             ViewBag.UnitID = new SelectList(db.Units, "UnitID", "Unit1", invoiceDetail.UnitID);
-            return View(invoiceDetail);
+
+         
+
+            return View("Details", invoiceDetail);
         }
 
         // GET: Invoices/Create
         public ActionResult Create()
         {
             ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name");
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1");
+            ViewBag.BankID = new SelectList(db.Banks, "BankID", "BankName");
             return View();
         }
 
@@ -209,7 +208,7 @@ namespace IncredibleInvoicer.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID,TaxID")] Invoice invoice)
+        public ActionResult Create([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID, BankID, ReverseCharge")] Invoices invoice)
         {
             if (ModelState.IsValid)
             {
@@ -233,8 +232,7 @@ namespace IncredibleInvoicer.Controllers
                 return RedirectToAction("Details", new { id = invoice.InvoiceID });
             }
 
-            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "TaxID", invoice.TaxID);
+            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);            
             return View(invoice);
         }
 
@@ -245,13 +243,13 @@ namespace IncredibleInvoicer.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Invoice invoice = db.Invoices.Find(id);
+            Invoices invoice = db.Invoices.Find(id);
             if (invoice == null)
             {
                 return HttpNotFound();
             }
             ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Tax1", invoice.TaxID);
+            ViewBag.BankID = new SelectList(db.Banks, "BankID", "BankName", invoice.BankID);
             return View(invoice);
         }
 
@@ -260,7 +258,7 @@ namespace IncredibleInvoicer.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID,TaxID,FriendlyID")] Invoice invoice)
+        public ActionResult Edit([Bind(Include = "InvoiceID,InvDate,POno,POdate,CustomerID,FriendlyID, BankID, ReverseCharge, RevChrg")] Invoices invoice)
         {
             if (ModelState.IsValid)
             {
@@ -268,8 +266,7 @@ namespace IncredibleInvoicer.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "TaxID", invoice.TaxID);
+            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "Name", invoice.CustomerID);            
             return View(invoice);
         }
 
@@ -280,7 +277,7 @@ namespace IncredibleInvoicer.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Invoice invoice = db.Invoices.Find(id);
+            Invoices invoice = db.Invoices.Find(id);
             if (invoice == null)
             {
                 return HttpNotFound();
@@ -293,7 +290,7 @@ namespace IncredibleInvoicer.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Invoice invoice = db.Invoices.Find(id);
+            Invoices invoice = db.Invoices.Find(id);
             db.Invoices.Remove(invoice);
             db.SaveChanges();
             return RedirectToAction("Index");

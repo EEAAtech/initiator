@@ -16,7 +16,12 @@ namespace IncredibleInvoicer
     }
 
     [MetadataType(typeof(InvoiceMetadata))]
-    public partial class Invoice
+    public partial class Invoices
+    {
+    }
+
+    [MetadataType(typeof(BanksMetadata))]
+    public partial class Banks
     {
     }
 
@@ -31,7 +36,7 @@ namespace IncredibleInvoicer
     }
 
     [MetadataType(typeof(TaxMetadata))]
-    public partial class Tax
+    public partial class Taxes
     {
     }
 
@@ -66,6 +71,20 @@ namespace IncredibleInvoicer
         [Required]
         [Range(0.0, Double.MaxValue)]
         public decimal Rate { get; set; }
+
+        [Display(Name = "Discount")]        
+        [Range(0.0, Double.MaxValue)]
+        public Nullable<decimal> Discount { get; set; }
+
+        [Display(Name = "Tax %")]
+        [Required]
+        public int TaxID { get; set; }
+
+        [Display(Name = "Misc. data")]
+        public string Disc { get; set; }
+
+        [Display(Name = "HSN Code")]
+        public string HSNCode { get; set; }
     }
 
     ///// <summary>

@@ -94,6 +94,7 @@ input[type=checkbox] {
     .section-to-not-print {
         visibility: hidden;
         display: none;
+        align-content:flex-start;
     }
 
     #PrintHeader, #PrintHeader * {

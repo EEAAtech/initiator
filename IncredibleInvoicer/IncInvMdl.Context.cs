@@ -28,10 +28,11 @@ namespace IncredibleInvoicer
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<State> States { get; set; }
         public virtual DbSet<Unit> Units { get; set; }
-        public virtual DbSet<Invoice> Invoices { get; set; }
-        public virtual DbSet<Tax> Taxes { get; set; }
         public virtual DbSet<InvoiceDetail> InvoiceDetails { get; set; }
-        public virtual DbSet<Item> Items { get; set; }
         public virtual DbSet<InvYr> InvYrs { get; set; }
+        public virtual DbSet<Banks> Banks { get; set; }
+        public virtual DbSet<Invoices> Invoices { get; set; }
+        public virtual DbSet<Taxes> Taxes { get; set; }
+        public virtual DbSet<Items> Items { get; set; }
     }
 }

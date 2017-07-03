@@ -10,107 +10,107 @@ using IncredibleInvoicer;
 
 namespace IncredibleInvoicer.Controllers
 {
-    public class TaxesController : Controller
+    public class BanksController : Controller
     {
         private IncredibleInvoicerEntities db = new IncredibleInvoicerEntities();
 
-        // GET: Taxes
+        // GET: Banks
         public ActionResult Index()
         {
-            return View(db.Taxes.ToList());
+            return View(db.Banks.ToList());
         }
 
-        // GET: Taxes/Details/5
+        // GET: Banks/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Taxes taxes = db.Taxes.Find(id);
-            if (taxes == null)
+            Banks banks = db.Banks.Find(id);
+            if (banks == null)
             {
                 return HttpNotFound();
             }
-            return View(taxes);
+            return View(banks);
         }
 
-        // GET: Taxes/Create
+        // GET: Banks/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Taxes/Create
+        // POST: Banks/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TaxID,Tax")] Taxes taxes)
+        public ActionResult Create([Bind(Include = "BankID,BankName,ACno,IFSC")] Banks banks)
         {
             if (ModelState.IsValid)
             {
-                db.Taxes.Add(taxes);
+                db.Banks.Add(banks);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(taxes);
+            return View(banks);
         }
 
-        // GET: Taxes/Edit/5
+        // GET: Banks/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Taxes taxes = db.Taxes.Find(id);
-            if (taxes == null)
+            Banks banks = db.Banks.Find(id);
+            if (banks == null)
             {
                 return HttpNotFound();
             }
-            return View(taxes);
+            return View(banks);
         }
 
-        // POST: Taxes/Edit/5
+        // POST: Banks/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TaxID,Tax")] Taxes taxes)
+        public ActionResult Edit([Bind(Include = "BankID,BankName,ACno,IFSC")] Banks banks)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(taxes).State = EntityState.Modified;
+                db.Entry(banks).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(taxes);
+            return View(banks);
         }
 
-        // GET: Taxes/Delete/5
+        // GET: Banks/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Taxes taxes = db.Taxes.Find(id);
-            if (taxes == null)
+            Banks banks = db.Banks.Find(id);
+            if (banks == null)
             {
                 return HttpNotFound();
             }
-            return View(taxes);
+            return View(banks);
         }
 
-        // POST: Taxes/Delete/5
+        // POST: Banks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Taxes taxes = db.Taxes.Find(id);
-            db.Taxes.Remove(taxes);
+            Banks banks = db.Banks.Find(id);
+            db.Banks.Remove(banks);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

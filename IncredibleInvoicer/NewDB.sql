@@ -1,14 +1,3 @@
-
-
-
-mgr@ii.in
-Gopika@17!
-
-
-
-
-USE [IncredibleInvoicer]
-GO
 /****** Object:  Table [dbo].[__MigrationHistory]    Script Date: 6/29/2017 3:16:20 PM ******/
 SET ANSI_NULLS ON
 GO

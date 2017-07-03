@@ -17,8 +17,8 @@ namespace IncredibleInvoicer
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Customer()
         {
-            this.Invoices = new HashSet<Invoice>();
-            this.Items = new HashSet<Item>();
+            this.Invoices = new HashSet<Invoices>();
+            this.Items = new HashSet<Items>();
         }
     
         public int CustomerID { get; set; }
@@ -34,8 +34,8 @@ namespace IncredibleInvoicer
     
         public virtual State State { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Invoice> Invoices { get; set; }
+        public virtual ICollection<Invoices> Invoices { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Item> Items { get; set; }
+        public virtual ICollection<Items> Items { get; set; }
     }
 }
